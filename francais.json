@@ -1,0 +1,152 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "astroCompatibility": "Compatibilité Astro",
+    "traitCompatibility": "Traits de caractère",
+    "discoverSign": "Découvrir son signe",
+    "matching": "Matching",
+    "contact": "Contact",
+    "language": "Langue"
+  },
+  "home": {
+    "title": "Zodiaq",
+    "subtitle": "Découvrez les mystères de l'univers et explorez votre compatibilité astrologique avec une précision cosmique.",
+    "features": {
+      "precise": {
+        "title": "Compatibilité Précise",
+        "desc": "Analyse détaillée basée sur les influences planétaires, les éléments et les qualités des signes."
+      },
+      "discovery": {
+        "title": "Découverte Personnelle",
+        "desc": "Comprenez vos forces, faiblesses et votre potentiel à travers votre signe zodiacal."
+      },
+      "matching": {
+        "title": "Matching Cosmique",
+        "desc": "Trouvez vos meilleures compatibilités et apprenez à naviguer dans vos relations."
+      }
+    },
+    "zodiacTitle": "Les Douze Signes du Zodiaque"
+  },
+  "astroCompatibility": {
+    "title": "Compatibilité Astrologique",
+    "subtitle": "Choisissez votre signe et celui de votre partenaire pour découvrir votre compatibilité cosmique.",
+    "yourSign": "Votre Signe",
+    "partnerSign": "Signe de votre partenaire",
+    "calculate": "Calculer la compatibilité"
+  },
+  "traitCompatibility": {
+    "title": "Compatibilité par Traits",
+    "subtitle": "Sélectionnez vos qualités et défauts, ainsi que ceux de votre partenaire, pour une analyse de compatibilité personnalisée.",
+    "yourTraits": "Vos Traits",
+    "partnerTraits": "Traits de votre partenaire",
+    "qualities": "Qualités",
+    "flaws": "Défauts",
+    "analyze": "Analyser la compatibilité"
+  },
+  "discoverSign": {
+    "title": "Découvrir son signe",
+    "subtitle": "Découvrez votre signe astrologique en fonction de votre date de naissance et explorez en détail ses caractéristiques uniques.",
+    "whatIsYourSign": "Quel est votre signe ?",
+    "deepAnalysis": {
+      "title": "Analyse Profonde",
+      "desc": "Comprenez vos forces, faiblesses et votre potentiel à travers une analyse détaillée de votre signe."
+    },
+    "elements": {
+      "title": "Éléments & Planètes",
+      "desc": "Découvrez comment les éléments (feu, terre, air, eau) et les planètes influencent votre personnalité."
+    },
+    "compatibilities": {
+      "title": "Compatibilités",
+      "desc": "Apprenez quels signes sont les plus compatibles avec le vôtre et pourquoi."
+    }
+  },
+  "matching": {
+    "title": "Matching",
+    "subtitle": "Découvrez vos meilleures compatibilités astrologiques et apprenez à naviguer dans vos relations.",
+    "bestMatches": "Meilleures compatibilités",
+    "worstMatches": "Moins bonnes compatibilités",
+    "guideTitle": "Guide de Compatibilité",
+    "elements": {
+      "fire": "Feu (Bélier, Lion, Sagittaire)",
+      "fireDesc": "Passion, énergie, créativité",
+      "earth": "Terre (Taureau, Vierge, Capricorne)",
+      "earthDesc": "Stabilité, pratique, fiabilité",
+      "air": "Air (Gémeaux, Balance, Verseau)",
+      "airDesc": "Communication, intellect, sociabilité",
+      "water": "Eau (Cancer, Scorpion, Poissons)",
+      "waterDesc": "Émotion, intuition, sensibilité"
+    }
+  },
+  "signDetail": {
+    "backToDiscovery": "Retour à la découverte",
+    "description": "Description",
+    "qualities": "Qualités",
+    "flaws": "Défauts",
+    "elements": "Éléments",
+    "rulingPlanet": "Planète maîtresse",
+    "opposite": "Signe opposé",
+    "compatibleWith": "Compatible avec:",
+    "oppositeDesc": "Polarité complémentaire qui crée une dynamique d'apprentissage.",
+    "bestMatches": "Meilleures Compatibilités",
+    "excellentCompatibility": "Excellente compatibilité"
+  },
+  "result": {
+    "back": "Retour",
+    "compatibility": "Compatibilité",
+    "analysis": "Analyse",
+    "share": "Partager",
+    "home": "Accueil",
+    "elements": "Éléments",
+    "rulingPlanet": "Planète maîtresse",
+    "relationshipAdvice": "Conseils pour la relation",
+    "advice": [
+      "Communiquez ouvertement sur vos besoins émotionnels et vos attentes.",
+      "Valorisez vos différences comme des complémentarités plutôt que des obstacles.",
+      "Planifiez des activités qui nourrissent votre connexion et respectent vos énergies.",
+      "Apprenez à reconnaître les signaux d'alerte de votre signe et ceux de votre partenaire."
+    ],
+    "emotional": "Émotionnelle",
+    "logical": "Logique",
+    "relational": "Relationnelle",
+    "overall": "Globale",
+    "strengths": "Points forts",
+    "areasOfAttention": "Points d'attention",
+    "shared": "partagé",
+    "complements": "complète",
+    "withoutCounterpart": "sans contrepartie positive",
+    "personalizedRecommendations": "Recommandations personnalisées",
+    "recommendations": [
+      "Pratiquez l'écoute active et la validation émotionnelle pour renforcer votre connexion.",
+      "Créez des rituels relationnels qui respectent les besoins de chacun.",
+      "Développez la compassion pour les défauts de l'autre, en les voyant comme des vulnérabilités.",
+      "Célébrez vos différences comme des opportunités d'apprentissage mutuel."
+    ]
+  },
+  "compatibility": {
+    "exceptional": "Une compatibilité exceptionnelle ! Vos énergies cosmiques s'harmonisent parfaitement, créant une relation dynamique et épanouissante. Vous vous comprenez intuitivement et partagez des valeurs fondamentales similaires.",
+    "good": "Une bonne compatibilité astrologique. Bien que vous ayez des différences, elles peuvent être complémentaires. Avec communication et compréhension mutuelle, votre relation peut s'épanouir harmonieusement.",
+    "moderate": "Une compatibilité modérée. Votre relation nécessitera des efforts conscients pour surmonter les défis astrologiques. Les différences peuvent être source de croissance si abordées avec patience.",
+    "low": "Une compatibilité faible selon les influences cosmiques. Cela ne signifie pas que la relation est impossible, mais qu'elle demandera une grande maturité et une volonté de transcender les influences planétaires."
+  },
+  "traitCompatibility": {
+    "exceptional": "Une compatibilité exceptionnelle sur le plan des traits de caractère ! Vos qualités se complètent parfaitement et vos défauts s'équilibrent harmonieusement. Cette relation a un fort potentiel d'épanouissement mutuel.",
+    "good": "Une bonne compatibilité émotionnelle et relationnelle. Vous partagez des valeurs importantes et vos différences peuvent être source de croissance si vous cultivez la communication et l'empathie.",
+    "moderate": "Une compatibilité modérée qui nécessitera des efforts conscients. Vos différences de tempérament peuvent créer des tensions, mais aussi des opportunités d'apprentissage si vous abordez les défis avec ouverture d'esprit.",
+    "low": "Une compatibilité faible sur le plan des traits de caractère. Cela ne signifie pas que la relation est vouée à l'échec, mais qu'elle demandera une grande maturité émotionnelle et une volonté de comprendre et d'accepter vos différences fondamentales."
+  },
+  "footer": {
+    "description": "Explorez les mystères des étoiles et découvrez votre compatibilité cosmique.",
+    "navigation": "Navigation",
+    "resources": "Ressources",
+    "signGuide": "Guide des signes",
+    "detailedCompatibilities": "Compatibilités détaillées",
+    "advancedAstrology": "Astrologie avancée",
+    "contact": "Contact",
+    "rightsReserved": "Tous droits réservés."
+  },
+  "share": {
+    "textAstro": "Ma compatibilité astrologique avec {partner} est de {score}%. Découvrez la vôtre sur Zodiaq !",
+    "textTrait": "Ma compatibilité avec mon partenaire est de {score}%. Découvrez la vôtre sur Zodiaq !",
+    "copied": "Lien copié dans le presse-papiers !"
+  }
+}
