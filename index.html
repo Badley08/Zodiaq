@@ -1,0 +1,2401 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zodiaq - Compatibilité Astrologique</title>
+    <meta name="description" content="Découvrez votre compatibilité astrologique avec d'autres signes zodiacaux">
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome via CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- React & ReactDOM via CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX processing -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 100%);
+            color: #e6e6ff;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .constellation-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: #ffffff;
+            border-radius: 50%;
+            animation: twinkle var(--duration, 4s) infinite ease-in-out;
+        }
+        
+        .star::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px 1px rgba(255, 255, 255, 0.7);
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        
+        .constellation-line {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            transform-origin: 0 0;
+        }
+        
+        .sign-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .sign-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(124, 58, 237, 0.3);
+        }
+        
+        .compatibility-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            transition: width 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+        }
+        
+        .trait-pill {
+            transition: all 0.3s ease;
+            border-radius: 50px;
+        }
+        
+        .trait-pill.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        
+        .result-card {
+            animation: fadeInScale 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .astro-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            background: linear-gradient(45deg, #a855f7, #ec4899, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.5), transparent);
+            margin: 4rem 0;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(124, 58, 237, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
+        }
+        
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .glow {
+            text-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+        }
+        
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .matching-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Constellation Background -->
+    <div class="constellation-bg" id="constellation-bg"></div>
+    
+    <!-- React Root -->
+    <div id="root"></div>
+    
+    <script id="zodiaq-data" type="application/json">
+    {
+        "signs": [
+            {
+                "id": "aries",
+                "name": "Bélier",
+                "english": "Aries",
+                "spanish": "Aries",
+                "dateRange": "21 mars - 19 avril",
+                "element": "Feu",
+                "rulingPlanet": "Mars",
+                "symbol": "♈",
+                "symbolFA": "fas fa-archway",
+                "color": "#ef4444",
+                "compatibility": {
+                    "taurus": 35,
+                    "gemini": 65,
+                    "cancer": 40,
+                    "leo": 85,
+                    "virgo": 45,
+                    "libra": 60,
+                    "scorpio": 50,
+                    "sagittarius": 90,
+                    "capricorn": 30,
+                    "aquarius": 70,
+                    "pisces": 45
+                },
+                "qualities": ["Courageux", "Énergique", "Déterminé", "Optimiste", "Passionné"],
+                "flaws": ["Impulsif", "Têtu", "Colérique", "Impatient", "Compétitif"],
+                "description": "Le Bélier est le premier signe du zodiaque, symbolisant le commencement et l'initiative. Gouverné par Mars, il incarne l'énergie brute, le courage et l'esprit pionnier.",
+                "compatibleElements": ["Feu", "Air"],
+                "oppositeSign": "Balance",
+                "bestMatches": ["Lion", "Sagittaire", "Gémeaux"],
+                "worstMatches": ["Cancer", "Capricorne", "Balance"]
+            },
+            {
+                "id": "taurus",
+                "name": "Taureau",
+                "english": "Taurus",
+                "spanish": "Tauro",
+                "dateRange": "20 avril - 20 mai",
+                "element": "Terre",
+                "rulingPlanet": "Vénus",
+                "symbol": "♉",
+                "symbolFA": "fas fa-bullseye",
+                "color": "#10b981",
+                "compatibility": {
+                    "aries": 35,
+                    "gemini": 40,
+                    "cancer": 80,
+                    "leo": 65,
+                    "virgo": 85,
+                    "libra": 75,
+                    "scorpio": 90,
+                    "sagittarius": 45,
+                    "capricorn": 85,
+                    "aquarius": 40,
+                    "pisces": 75
+                },
+                "qualities": ["Fidèle", "Patient", "Fiable", "Déterminé", "Sensuel"],
+                "flaws": ["Têtu", "Possessif", "Paresseux", "Materialiste", "Inflexible"],
+                "description": "Le Taureau incarne la stabilité, la persévérance et l'amour des plaisirs terrestres. Gouverné par Vénus, il recherche la sécurité, la beauté et la tranquillité.",
+                "compatibleElements": ["Terre", "Eau"],
+                "oppositeSign": "Scorpion",
+                "bestMatches": ["Vierge", "Capricorne", "Cancer"],
+                "worstMatches": ["Lion", "Verseau", "Bélier"]
+            },
+            {
+                "id": "gemini",
+                "name": "Gémeaux",
+                "english": "Gemini",
+                "spanish": "Géminis",
+                "dateRange": "21 mai - 20 juin",
+                "element": "Air",
+                "rulingPlanet": "Mercure",
+                "symbol": "♊",
+                "symbolFA": "fas fa-wind",
+                "color": "#3b82f6",
+                "compatibility": {
+                    "aries": 65,
+                    "taurus": 40,
+                    "cancer": 55,
+                    "leo": 75,
+                    "virgo": 70,
+                    "libra": 85,
+                    "scorpio": 45,
+                    "sagittarius": 80,
+                    "capricorn": 45,
+                    "aquarius": 90,
+                    "pisces": 50
+                },
+                "qualities": ["Adaptable", "Curieux", "Intelligent", "Communicatif", "Ingénieux"],
+                "flaws": ["Indécis", "Impulsif", "Nerveux", "Superficiel", "Inconstant"],
+                "description": "Les Gémeaux représentent la dualité, la communication et l'intellect. Gouvernés par Mercure, ils sont dotés d'une vivacité d'esprit exceptionnelle et d'une soif insatiable de connaissances.",
+                "compatibleElements": ["Air", "Feu"],
+                "oppositeSign": "Sagittaire",
+                "bestMatches": ["Balance", "Verseau", "Lion"],
+                "worstMatches": ["Vierge", "Poissons", "Scorpion"]
+            },
+            {
+                "id": "cancer",
+                "name": "Cancer",
+                "english": "Cancer",
+                "spanish": "Cáncer",
+                "dateRange": "21 juin - 22 juillet",
+                "element": "Eau",
+                "rulingPlanet": "Lune",
+                "symbol": "♋",
+                "symbolFA": "fas fa-moon",
+                "color": "#8b5cf6",
+                "compatibility": {
+                    "aries": 40,
+                    "taurus": 80,
+                    "gemini": 55,
+                    "leo": 70,
+                    "virgo": 75,
+                    "libra": 50,
+                    "scorpio": 85,
+                    "sagittarius": 40,
+                    "capricorn": 70,
+                    "aquarius": 45,
+                    "pisces": 90
+                },
+                "qualities": ["Empathique", "Protecteur", "Intuitif", "Loyal", "Imaginatif"],
+                "flaws": ["Sensible", "Pessimiste", "Rancunier", "Méfiant", "Dépendant"],
+                "description": "Le Cancer symbolise l'émotion, la protection et l'intuition. Gouverné par la Lune, il est profondément sensible, empathique et valorise les liens familiaux et affectifs.",
+                "compatibleElements": ["Eau", "Terre"],
+                "oppositeSign": "Capricorne",
+                "bestMatches": ["Poissons", "Scorpion", "Taureau"],
+                "worstMatches": ["Bélier", "Balance", "Verseau"]
+            },
+            {
+                "id": "leo",
+                "name": "Lion",
+                "english": "Leo",
+                "spanish": "Leo",
+                "dateRange": "23 juillet - 22 août",
+                "element": "Feu",
+                "rulingPlanet": "Soleil",
+                "symbol": "♌",
+                "symbolFA": "fas fa-sun",
+                "color": "#f59e0b",
+                "compatibility": {
+                    "aries": 85,
+                    "taurus": 65,
+                    "gemini": 75,
+                    "cancer": 70,
+                    "virgo": 55,
+                    "libra": 80,
+                    "scorpio": 45,
+                    "sagittarius": 85,
+                    "capricorn": 40,
+                    "aquarius": 60,
+                    "pisces": 55
+                },
+                "qualities": ["Généreux", "Chaleureux", "Créatif", "Loyal", "Enthousiaste"],
+                "flaws": ["Orgueilleux", "Têtu", "Dominant", "Dramatique", "Egocentrique"],
+                "description": "Le Lion incarne la royauté, la créativité et la générosité. Gouverné par le Soleil, il rayonne de chaleur, de confiance en soi et d'un désir naturel d'être admiré.",
+                "compatibleElements": ["Feu", "Air"],
+                "oppositeSign": "Verseau",
+                "bestMatches": ["Bélier", "Sagittaire", "Balance"],
+                "worstMatches": ["Scorpion", "Verseau", "Capricorne"]
+            },
+            {
+                "id": "virgo",
+                "name": "Vierge",
+                "english": "Virgo",
+                "spanish": "Virgo",
+                "dateRange": "23 août - 22 septembre",
+                "element": "Terre",
+                "rulingPlanet": "Mercure",
+                "symbol": "♍",
+                "symbolFA": "fas fa-seedling",
+                "color": "#6b7280",
+                "compatibility": {
+                    "aries": 45,
+                    "taurus": 85,
+                    "gemini": 70,
+                    "cancer": 75,
+                    "leo": 55,
+                    "libra": 60,
+                    "scorpio": 75,
+                    "sagittarius": 40,
+                    "capricorn": 90,
+                    "aquarius": 55,
+                    "pisces": 70
+                },
+                "qualities": ["Analytique", "Pratique", "Fiable", "Méticuleux", "Altruiste"],
+                "flaws": ["Critique", "Perfectionniste", "Inquiet", "Réservé", "Pudique"],
+                "description": "La Vierge symbolise la pureté, le service et l'analyse. Gouvernée par Mercure, elle excelle dans l'organisation, l'attention aux détails et la recherche de perfection.",
+                "compatibleElements": ["Terre", "Eau"],
+                "oppositeSign": "Poissons",
+                "bestMatches": ["Capricorne", "Taureau", "Cancer"],
+                "worstMatches": ["Sagittaire", "Gémeaux", "Lion"]
+            },
+            {
+                "id": "libra",
+                "name": "Balance",
+                "english": "Libra",
+                "spanish": "Libra",
+                "dateRange": "23 septembre - 22 octobre",
+                "element": "Air",
+                "rulingPlanet": "Vénus",
+                "symbol": "♎",
+                "symbolFA": "fas fa-balance-scale",
+                "color": "#ec4899",
+                "compatibility": {
+                    "aries": 60,
+                    "taurus": 75,
+                    "gemini": 85,
+                    "cancer": 50,
+                    "leo": 80,
+                    "virgo": 60,
+                    "scorpio": 65,
+                    "sagittarius": 75,
+                    "capricorn": 50,
+                    "aquarius": 85,
+                    "pisces": 65
+                },
+                "qualities": ["Diplomate", "Gracieux", "Juste", "Social", "Coopératif"],
+                "flaws": ["Indécis", "Évite les conflits", "Superficiel", "Rancunier", "Plaisantin"],
+                "description": "La Balance représente l'équilibre, l'harmonie et la justice. Gouvernée par Vénus, elle recherche la beauté, les relations équilibrées et l'élégance dans tous les aspects de la vie.",
+                "compatibleElements": ["Air", "Feu"],
+                "oppositeSign": "Bélier",
+                "bestMatches": ["Gémeaux", "Verseau", "Lion"],
+                "worstMatches": ["Capricorne", "Cancer", "Bélier"]
+            },
+            {
+                "id": "scorpio",
+                "name": "Scorpion",
+                "english": "Scorpio",
+                "spanish": "Escorpio",
+                "dateRange": "23 octobre - 21 novembre",
+                "element": "Eau",
+                "rulingPlanet": "Pluton, Mars",
+                "symbol": "♏",
+                "symbolFA": "fas fa-scorpion",
+                "color": "#be185d",
+                "compatibility": {
+                    "aries": 50,
+                    "taurus": 90,
+                    "gemini": 45,
+                    "cancer": 85,
+                    "leo": 45,
+                    "virgo": 75,
+                    "libra": 65,
+                    "sagittarius": 50,
+                    "capricorn": 80,
+                    "aquarius": 55,
+                    "pisces": 95
+                },
+                "qualities": ["Passionné", "Ressourceux", "Brave", "Loyal", "Intuitif"],
+                "flaws": ["Jaloux", "Secret", "Sceptique", "Rancunier", "Obsessionnel"],
+                "description": "Le Scorpion incarne la transformation, la passion et le mystère. Gouverné par Pluton et Mars, il possède une grande force intérieure, une intuition profonde et une loyauté inébranlable.",
+                "compatibleElements": ["Eau", "Terre"],
+                "oppositeSign": "Taureau",
+                "bestMatches": ["Poissons", "Cancer", "Capricorne"],
+                "worstMatches": ["Lion", "Verseau", "Gémeaux"]
+            },
+            {
+                "id": "sagittarius",
+                "name": "Sagittaire",
+                "english": "Sagittarius",
+                "spanish": "Sagitario",
+                "dateRange": "22 novembre - 21 décembre",
+                "element": "Feu",
+                "rulingPlanet": "Jupiter",
+                "symbol": "♐",
+                "symbolFA": "fas fa-arrow-up-right-dots",
+                "color": "#059669",
+                "compatibility": {
+                    "aries": 90,
+                    "taurus": 45,
+                    "gemini": 80,
+                    "cancer": 40,
+                    "leo": 85,
+                    "virgo": 40,
+                    "libra": 75,
+                    "scorpio": 50,
+                    "capricorn": 40,
+                    "aquarius": 80,
+                    "pisces": 65
+                },
+                "qualities": ["Optimiste", "Aventurier", "Philosophe", "Indépendant", "Honnête"],
+                "flaws": ["Impulsif", "Impatient", "Superficiel", "Irrespectueux", "Inconstant"],
+                "description": "Le Sagittaire symbolise l'exploration, la philosophie et la liberté. Gouverné par Jupiter, il aspire à la découverte, à l'expansion de l'esprit et à la vérité universelle.",
+                "compatibleElements": ["Feu", "Air"],
+                "oppositeSign": "Gémeaux",
+                "bestMatches": ["Bélier", "Lion", "Balance"],
+                "worstMatches": ["Vierge", "Taureau", "Capricorne"]
+            },
+            {
+                "id": "capricorn",
+                "name": "Capricorne",
+                "english": "Capricorn",
+                "spanish": "Capricornio",
+                "dateRange": "22 décembre - 19 janvier",
+                "element": "Terre",
+                "rulingPlanet": "Saturne",
+                "symbol": "♑",
+                "symbolFA": "fas fa-mountain",
+                "color": "#7c2d12",
+                "compatibility": {
+                    "aries": 30,
+                    "taurus": 85,
+                    "gemini": 45,
+                    "cancer": 70,
+                    "leo": 40,
+                    "virgo": 90,
+                    "libra": 50,
+                    "scorpio": 80,
+                    "sagittarius": 40,
+                    "aquarius": 75,
+                    "pisces": 65
+                },
+                "qualities": ["Responsable", "Discipliné", "Ambitieux", "Prudent", "Patient"],
+                "flaws": ["Pessimiste", "Rigide", "Intolérant", "Réservé", "Calculateur"],
+                "description": "Le Capricorne incarne la structure, la discipline et l'ambition. Gouverné par Saturne, il construit patiemment sa réussite avec pragmatisme, persévérance et sérieux.",
+                "compatibleElements": ["Terre", "Eau"],
+                "oppositeSign": "Cancer",
+                "bestMatches": ["Vierge", "Taureau", "Scorpion"],
+                "worstMatches": ["Bélier", "Lion", "Balance"]
+            },
+            {
+                "id": "aquarius",
+                "name": "Verseau",
+                "english": "Aquarius",
+                "spanish": "Acuario",
+                "dateRange": "20 janvier - 18 février",
+                "element": "Air",
+                "rulingPlanet": "Uranus, Saturne",
+                "symbol": "♒",
+                "symbolFA": "fas fa-water",
+                "color": "#0ea5e9",
+                "compatibility": {
+                    "aries": 70,
+                    "taurus": 40,
+                    "gemini": 90,
+                    "cancer": 45,
+                    "leo": 60,
+                    "virgo": 55,
+                    "libra": 85,
+                    "scorpio": 55,
+                    "sagittarius": 80,
+                    "capricorn": 75,
+                    "pisces": 70
+                },
+                "qualities": ["Progressiste", "Original", "Indépendant", "Humaniste", "Intelligent"],
+                "flaws": ["Distant", "Rebelle", "Imprévisible", "Détaché", "Têtu"],
+                "description": "Le Verseau représente l'innovation, l'humanisme et l'indépendance. Gouverné par Uranus et Saturne, il pense de façon originale, défend les causes humanitaires et valorise la liberté individuelle.",
+                "compatibleElements": ["Air", "Feu"],
+                "oppositeSign": "Lion",
+                "bestMatches": ["Gémeaux", "Balance", "Sagittaire"],
+                "worstMatches": ["Taureau", "Scorpion", "Lion"]
+            },
+            {
+                "id": "pisces",
+                "name": "Poissons",
+                "english": "Pisces",
+                "spanish": "Piscis",
+                "dateRange": "19 février - 20 mars",
+                "element": "Eau",
+                "rulingPlanet": "Neptune, Jupiter",
+                "symbol": "♓",
+                "symbolFA": "fas fa-fish",
+                "color": "#7e22ce",
+                "compatibility": {
+                    "aries": 45,
+                    "taurus": 75,
+                    "gemini": 50,
+                    "cancer": 90,
+                    "leo": 55,
+                    "virgo": 70,
+                    "libra": 65,
+                    "scorpio": 95,
+                    "sagittarius": 65,
+                    "capricorn": 65,
+                    "aquarius": 70
+                },
+                "qualities": ["Compassionnel", "Artistique", "Intuitif", "Gentil", "Sensible"],
+                "flaws": ["Peureux", "Vague", "Victimiste", "Évite la réalité", "Dépendant"],
+                "description": "Les Poissons symbolisent la compassion, l'intuition et la spiritualité. Gouvernés par Neptune et Jupiter, ils vivent dans un monde d'émotions profondes, d'imagination fertile et de connexion spirituelle.",
+                "compatibleElements": ["Eau", "Terre"],
+                "oppositeSign": "Vierge",
+                "bestMatches": ["Scorpion", "Cancer", "Taureau"],
+                "worstMatches": ["Gémeaux", "Sagittaire", "Vierge"]
+            }
+        ],
+        "traits": {
+            "qualities": [
+                "Empathie", "Créativité", "Honnêteté", "Patience", "Optimisme", 
+                "Détermination", "Humour", "Curiosité", "Loyauté", "Générosité",
+                "Courage", "Intelligence", "Sensualité", "Intuition", "Adaptabilité"
+            ],
+            "flaws": [
+                "Impulsivité", "Têtu", "Indécis", "Sensible", "Paresseux",
+                "Colérique", "Jaloux", "Distant", "Perfectionniste", "Sarcastique",
+                "Anxieux", "Rancunier", "Superficiel", "Pessimiste", "Possessif"
+            ]
+        },
+        "translations": {
+            "fr": {
+                "home": "Accueil",
+                "astroCompatibility": "Compatibilité Astro",
+                "traitCompatibility": "Traits de caractère",
+                "discoverSign": "Découvrir son signe",
+                "matching": "Matching",
+                "contact": "Contact",
+                "email": "karlluberisse1308@gmail.com",
+                "language": "Langue",
+                "share": "Partager",
+                "compatibility": "Compatibilité",
+                "analysis": "Analyse",
+                "qualities": "Qualités",
+                "flaws": "Défauts",
+                "elements": "Éléments",
+                "bestMatches": "Meilleures compatibilités",
+                "worstMatches": "Moins bonnes compatibilités",
+                "opposite": "Signe opposé",
+                "rulingPlanet": "Planète maîtresse",
+                "dateRange": "Période",
+                "description": "Description",
+                "calculate": "Calculer la compatibilité",
+                "analyze": "Analyser la compatibilité",
+                "yourSign": "Votre Signe",
+                "partnerSign": "Signe de votre partenaire",
+                "yourTraits": "Vos Traits",
+                "partnerTraits": "Traits de votre partenaire",
+                "emotional": "Émotionnelle",
+                "logical": "Logique",
+                "relational": "Relationnelle",
+                "overall": "Globale"
+            },
+            "en": {
+                "home": "Home",
+                "astroCompatibility": "Astro Compatibility",
+                "traitCompatibility": "Personality Traits",
+                "discoverSign": "Discover Your Sign",
+                "matching": "Matching",
+                "contact": "Contact",
+                "email": "karlluberisse1308@gmail.com",
+                "language": "Language",
+                "share": "Share",
+                "compatibility": "Compatibility",
+                "analysis": "Analysis",
+                "qualities": "Qualities",
+                "flaws": "Flaws",
+                "elements": "Elements",
+                "bestMatches": "Best Matches",
+                "worstMatches": "Worst Matches",
+                "opposite": "Opposite Sign",
+                "rulingPlanet": "Ruling Planet",
+                "dateRange": "Date Range",
+                "description": "Description",
+                "calculate": "Calculate Compatibility",
+                "analyze": "Analyze Compatibility",
+                "yourSign": "Your Sign",
+                "partnerSign": "Partner's Sign",
+                "yourTraits": "Your Traits",
+                "partnerTraits": "Partner's Traits",
+                "emotional": "Emotional",
+                "logical": "Logical",
+                "relational": "Relational",
+                "overall": "Overall"
+            },
+            "es": {
+                "home": "Inicio",
+                "astroCompatibility": "Compatibilidad Astrológica",
+                "traitCompatibility": "Rasgos de Personalidad",
+                "discoverSign": "Descubre tu Signo",
+                "matching": "Compatibilidad",
+                "contact": "Contacto",
+                "email": "karlluberisse1308@gmail.com",
+                "language": "Idioma",
+                "share": "Compartir",
+                "compatibility": "Compatibilidad",
+                "analysis": "Análisis",
+                "qualities": "Cualidades",
+                "flaws": "Defectos",
+                "elements": "Elementos",
+                "bestMatches": "Mejores Compatibilidades",
+                "worstMatches": "Peores Compatibilidades",
+                "opposite": "Signo Opuesto",
+                "rulingPlanet": "Planeta Regente",
+                "dateRange": "Rango de Fechas",
+                "description": "Descripción",
+                "calculate": "Calcular Compatibilidad",
+                "analyze": "Analizar Compatibilidad",
+                "yourSign": "Tu Signo",
+                "partnerSign": "Signo de tu Pareja",
+                "yourTraits": "Tus Rasgos",
+                "partnerTraits": "Rasgos de tu Pareja",
+                "emotional": "Emocional",
+                "logical": "Lógico",
+                "relational": "Relacional",
+                "overall": "General"
+            }
+        }
+    }
+    </script>
+    
+    <script type="text/babel">
+        // Create constellation background
+        function createConstellation() {
+            const bg = document.getElementById('constellation-bg');
+            const starCount = 200;
+            const stars = [];
+            
+            // Create stars
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Random position
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                
+                // Random size and animation
+                const size = Math.random() * 2 + 1;
+                const duration = 2 + Math.random() * 6;
+                
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.setProperty('--duration', `${duration}s`);
+                
+                bg.appendChild(star);
+                stars.push({ x, y, element: star });
+            }
+            
+            // Create constellation lines (connect some stars)
+            const lineCount = 30;
+            for (let i = 0; i < lineCount; i++) {
+                const line = document.createElement('div');
+                line.classList.add('constellation-line');
+                
+                const star1 = stars[Math.floor(Math.random() * stars.length)];
+                const star2 = stars[Math.floor(Math.random() * stars.length)];
+                
+                if (star1 === star2) continue;
+                
+                // Calculate distance and angle
+                const dx = (star2.x - star1.x) * window.innerWidth / 100;
+                const dy = (star2.y - star1.y) * window.innerHeight / 100;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                
+                line.style.width = `${length}px`;
+                line.style.height = '1px';
+                line.style.left = `${star1.x}%`;
+                line.style.top = `${star1.y}%`;
+                line.style.transform = `rotate(${angle}deg)`;
+                
+                bg.appendChild(line);
+            }
+        }
+        
+        // Initialize constellation
+        document.addEventListener('DOMContentLoaded', createConstellation);
+        
+        // Parse data
+        const dataScript = document.getElementById('zodiaq-data');
+        const zodiaqData = JSON.parse(dataScript.textContent);
+        const { signs, traits, translations } = zodiaqData;
+        
+        // React Components
+        const { useState, useEffect, useMemo } = React;
+        
+        // Language Context
+        const LanguageContext = React.createContext({
+            lang: 'fr',
+            setLang: () => {}
+        });
+        
+        // App Component
+        function App() {
+            const [currentView, setCurrentView] = useState('home');
+            const [lang, setLang] = useState('fr');
+            const [selectedSign, setSelectedSign] = useState(null);
+            const [selectedPartnerSign, setSelectedPartnerSign] = useState(null);
+            const [astroResult, setAstroResult] = useState(null);
+            
+            // Trait-based compatibility state
+            const [userTraits, setUserTraits] = useState({qualities: [], flaws: []});
+            const [partnerTraits, setPartnerTraits] = useState({qualities: [], flaws: []});
+            const [traitResult, setTraitResult] = useState(null);
+            
+            const t = useMemo(() => translations[lang], [lang]);
+            
+            return (
+                <LanguageContext.Provider value={{ lang, setLang, t }}>
+                    <div className="relative min-h-screen">
+                        <Header 
+                            currentView={currentView} 
+                            setCurrentView={setCurrentView}
+                            lang={lang}
+                            setLang={setLang}
+                        />
+                        <main className="container mx-auto px-4 py-8">
+                            {currentView === 'home' && <Home setCurrentView={setCurrentView} />}
+                            {currentView === 'astro-compatibility' && (
+                                <AstroCompatibility 
+                                    signs={signs}
+                                    selectedSign={selectedSign}
+                                    setSelectedSign={setSelectedSign}
+                                    selectedPartnerSign={selectedPartnerSign}
+                                    setSelectedPartnerSign={setSelectedPartnerSign}
+                                    astroResult={astroResult}
+                                    setAstroResult={setAstroResult}
+                                    setCurrentView={setCurrentView}
+                                />
+                            )}
+                            {currentView === 'trait-compatibility' && (
+                                <TraitCompatibility 
+                                    traits={traits}
+                                    userTraits={userTraits}
+                                    setUserTraits={setUserTraits}
+                                    partnerTraits={partnerTraits}
+                                    setPartnerTraits={setPartnerTraits}
+                                    traitResult={traitResult}
+                                    setTraitResult={setTraitResult}
+                                    setCurrentView={setCurrentView}
+                                />
+                            )}
+                            {currentView === 'discover-sign' && (
+                                <DiscoverSign signs={signs} />
+                            )}
+                            {currentView === 'matching' && (
+                                <Matching signs={signs} />
+                            )}
+                            {currentView === 'result' && astroResult && (
+                                <ResultView 
+                                    result={astroResult}
+                                    type="astro"
+                                    setCurrentView={setCurrentView}
+                                />
+                            )}
+                            {currentView === 'trait-result' && traitResult && (
+                                <ResultView 
+                                    result={traitResult}
+                                    type="trait"
+                                    setCurrentView={setCurrentView}
+                                />
+                            )}
+                            {currentView === 'sign-detail' && selectedSign && (
+                                <SignDetail 
+                                    sign={signs.find(s => s.id === selectedSign)}
+                                    signs={signs}
+                                    setCurrentView={setCurrentView}
+                                />
+                            )}
+                        </main>
+                        <Footer />
+                    </div>
+                </LanguageContext.Provider>
+            );
+        }
+        
+        // Header Component
+        function Header({ currentView, setCurrentView, lang, setLang }) {
+            const { t } = React.useContext(LanguageContext);
+            
+            return (
+                <header className="container mx-auto px-4 py-6">
+                    <div className="flex flex-col md:flex-row justify-between items-center">
+                        <div className="flex items-center space-x-4 mb-4 md:mb-0">
+                            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg">
+                                <i className="fas fa-star text-white text-xl"></i>
+                            </div>
+                            <h1 className="text-3xl font-bold astro-title">Zodiaq</h1>
+                        </div>
+                        
+                        <nav className="flex flex-wrap justify-center gap-4 md:gap-6 mb-4 md:mb-0">
+                            <NavItem 
+                                active={currentView === 'home'} 
+                                onClick={() => setCurrentView('home')}
+                            >
+                                {t.home}
+                            </NavItem>
+                            <NavItem 
+                                active={currentView === 'astro-compatibility'} 
+                                onClick={() => setCurrentView('astro-compatibility')}
+                            >
+                                {t.astroCompatibility}
+                            </NavItem>
+                            <NavItem 
+                                active={currentView === 'trait-compatibility'} 
+                                onClick={() => setCurrentView('trait-compatibility')}
+                            >
+                                {t.traitCompatibility}
+                            </NavItem>
+                            <NavItem 
+                                active={currentView === 'discover-sign'} 
+                                onClick={() => setCurrentView('discover-sign')}
+                            >
+                                {t.discoverSign}
+                            </NavItem>
+                            <NavItem 
+                                active={currentView === 'matching'} 
+                                onClick={() => setCurrentView('matching')}
+                            >
+                                {t.matching}
+                            </NavItem>
+                        </nav>
+                        
+                        <div className="flex items-center space-x-4">
+                            <LanguageSelector lang={lang} setLang={setLang} />
+                            <ContactButton />
+                        </div>
+                    </div>
+                </header>
+            );
+        }
+        
+        function NavItem({ active, onClick, children }) {
+            return (
+                <button
+                    onClick={onClick}
+                    className={`px-3 py-2 rounded-lg font-medium transition-all ${
+                        active 
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg' 
+                            : 'text-gray-300 hover:text-white hover:bg-gray-800'
+                    }`}
+                >
+                    {children}
+                </button>
+            );
+        }
+        
+        function LanguageSelector({ lang, setLang }) {
+            const { t } = React.useContext(LanguageContext);
+            
+            return (
+                <div className="relative">
+                    <button className="flex items-center space-x-2 text-gray-300 hover:text-white">
+                        <i className="fas fa-globe"></i>
+                        <span>{t.language}: {lang.toUpperCase()}</span>
+                        <i className="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div className="absolute right-0 mt-2 w-40 bg-gray-800 rounded-lg shadow-xl z-10 hidden group-hover:block">
+                        <button 
+                            onClick={() => setLang('fr')}
+                            className={`block w-full text-left px-4 py-2 hover:bg-gray-700 ${
+                                lang === 'fr' ? 'text-purple-400' : 'text-gray-300'
+                            }`}
+                        >
+                            Français
+                        </button>
+                        <button 
+                            onClick={() => setLang('en')}
+                            className={`block w-full text-left px-4 py-2 hover:bg-gray-700 ${
+                                lang === 'en' ? 'text-purple-400' : 'text-gray-300'
+                            }`}
+                        >
+                            English
+                        </button>
+                        <button 
+                            onClick={() => setLang('es')}
+                            className={`block w-full text-left px-4 py-2 hover:bg-gray-700 ${
+                                lang === 'es' ? 'text-purple-400' : 'text-gray-300'
+                            }`}
+                        >
+                            Español
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+        
+        function ContactButton() {
+            return (
+                <button 
+                    onClick={() => window.location.href = 'mailto:karlluberisse1308@gmail.com'}
+                    className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                >
+                    <i className="fas fa-envelope"></i>
+                    <span>karlluberisse1308@gmail.com</span>
+                </button>
+            );
+        }
+        
+        // Home Component
+        function Home({ setCurrentView }) {
+            const { t } = React.useContext(LanguageContext);
+            
+            return (
+                <div className="py-12">
+                    <div className="text-center mb-16">
+                        <h1 className="text-5xl md:text-7xl font-bold mb-6 astro-title">
+                            Zodiaq
+                        </h1>
+                        <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-10">
+                            Découvrez les mystères de l'univers et explorez votre compatibilité 
+                            astrologique avec une précision cosmique.
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-4">
+                            <button 
+                                onClick={() => setCurrentView('astro-compatibility')}
+                                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all shadow-lg pulse"
+                            >
+                                <i className="fas fa-star mr-2"></i>
+                                {t.astroCompatibility}
+                            </button>
+                            <button 
+                                onClick={() => setCurrentView('discover-sign')}
+                                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-cyan-700 transform hover:scale-105 transition-all shadow-lg"
+                            >
+                                <i className="fas fa-magnifying-glass mr-2"></i>
+                                {t.discoverSign}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                        {[
+                            { 
+                                icon: "fas fa-star", 
+                                title: "Compatibilité Précise", 
+                                desc: "Analyse détaillée basée sur les influences planétaires, les éléments et les qualités des signes."
+                            },
+                            { 
+                                icon: "fas fa-user-astronaut", 
+                                title: "Découverte Personnelle", 
+                                desc: "Comprenez vos forces, faiblesses et votre potentiel à travers votre signe zodiacal."
+                            },
+                            { 
+                                icon: "fas fa-heart-circle-check", 
+                                title: "Matching Cosmique", 
+                                desc: "Trouvez vos meilleures compatibilités et apprenez à naviguer dans vos relations."
+                            }
+                        ].map((item, index) => (
+                            <div 
+                                key={index} 
+                                className="sign-card bg-gray-800/40 p-6 backdrop-blur-sm border border-gray-700"
+                            >
+                                <div className="text-4xl text-purple-400 mb-4">
+                                    <i className={item.icon}></i>
+                                </div>
+                                <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+                                <p className="text-gray-400">{item.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div className="text-center">
+                        <h2 className="text-3xl font-bold mb-8 astro-title">Les Douze Signes du Zodiaque</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-w-6xl mx-auto">
+                            {signs.map((sign, index) => (
+                                <div 
+                                    key={sign.id}
+                                    onClick={() => {
+                                        setCurrentView('sign-detail');
+                                        setSelectedSign(sign.id);
+                                    }}
+                                    className="sign-card bg-gradient-to-br from-gray-800/60 to-gray-900/60 p-4 cursor-pointer group"
+                                    style={{
+                                        borderLeft: `4px solid ${sign.color}`
+                                    }}
+                                >
+                                    <div className="text-3xl mb-2 text-center group-hover:scale-110 transition-transform">
+                                        <i className={sign.symbolFA}></i>
+                                    </div>
+                                    <div className="font-semibold text-center">{sign.name}</div>
+                                    <div className="text-xs text-gray-400 text-center mt-1">{sign.dateRange}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Astro Compatibility Component
+        function AstroCompatibility({ 
+            signs, 
+            selectedSign, 
+            setSelectedSign, 
+            selectedPartnerSign, 
+            setSelectedPartnerSign, 
+            astroResult, 
+            setAstroResult, 
+            setCurrentView 
+        }) {
+            const { t } = React.useContext(LanguageContext);
+            
+            const calculateCompatibility = () => {
+                if (!selectedSign || !selectedPartnerSign) return;
+                
+                const sign1 = signs.find(s => s.id === selectedSign);
+                const sign2 = signs.find(s => s.id === selectedPartnerSign);
+                
+                const compatibility = sign1.compatibility[selectedPartnerSign] || 50;
+                
+                // Generate detailed analysis
+                let analysis = "";
+                if (compatibility >= 80) {
+                    analysis = t.lang === 'fr' ? 
+                        "Une compatibilité exceptionnelle ! Vos énergies cosmiques s'harmonisent parfaitement, créant une relation dynamique et épanouissante. Vous vous comprenez intuitivement et partagez des valeurs fondamentales similaires." :
+                        t.lang === 'en' ?
+                        "Exceptional compatibility! Your cosmic energies harmonize perfectly, creating a dynamic and fulfilling relationship. You intuitively understand each other and share similar fundamental values." :
+                        "¡Compatibilidad excepcional! Tus energías cósmicas se armonizan perfectamente, creando una relación dinámica y satisfactoria. Se entienden intuitivamente y comparten valores fundamentales similares.";
+                } else if (compatibility >= 60) {
+                    analysis = t.lang === 'fr' ? 
+                        "Une bonne compatibilité astrologique. Bien que vous ayez des différences, elles peuvent être complémentaires. Avec communication et compréhension mutuelle, votre relation peut s'épanouir harmonieusement." :
+                        t.lang === 'en' ?
+                        "Good astrological compatibility. Although you have differences, they can be complementary. With communication and mutual understanding, your relationship can flourish harmoniously." :
+                        "Buena compatibilidad astrológica. Aunque tienen diferencias, estas pueden ser complementarias. Con comunicación y comprensión mutua, su relación puede florecer armoniosamente.";
+                } else if (compatibility >= 40) {
+                    analysis = t.lang === 'fr' ? 
+                        "Une compatibilité modérée. Votre relation nécessitera des efforts conscients pour surmonter les défis astrologiques. Les différences peuvent être source de croissance si abordées avec patience." :
+                        t.lang === 'en' ?
+                        "Moderate compatibility. Your relationship will require conscious effort to overcome astrological challenges. Differences can be a source of growth if approached with patience." :
+                        "Compatibilidad moderada. Su relación requerirá un esfuerzo consciente para superar los desafíos astrológicos. Las diferencias pueden ser una fuente de crecimiento si se abordan con paciencia.";
+                } else {
+                    analysis = t.lang === 'fr' ? 
+                        "Une compatibilité faible selon les influences cosmiques. Cela ne signifie pas que la relation est impossible, mais qu'elle demandera une grande maturité et une volonté de transcender les influences planétaires." :
+                        t.lang === 'en' ?
+                        "Low compatibility according to cosmic influences. This does not mean the relationship is impossible, but it will require great maturity and a willingness to transcend planetary influences." :
+                        "Baja compatibilidad según las influencias cósmicas. Esto no significa que la relación sea imposible, pero requerirá gran madurez y voluntad para trascender las influencias planetarias.";
+                }
+                
+                setAstroResult({
+                    sign1: sign1,
+                    sign2: sign2,
+                    compatibility: compatibility,
+                    analysis: analysis
+                });
+                setCurrentView('result');
+            };
+            
+            return (
+                <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-12">
+                        <h1 className="text-4xl font-bold mb-4 astro-title">
+                            {t.astroCompatibility}
+                        </h1>
+                        <p className="text-gray-400 max-w-2xl mx-auto">
+                            {t.lang === 'fr' ? 
+                                "Choisissez votre signe et celui de votre partenaire pour découvrir votre compatibilité cosmique." :
+                                t.lang === 'en' ?
+                                "Choose your sign and your partner's sign to discover your cosmic compatibility." :
+                                "Elija su signo y el de su pareja para descubrir su compatibilidad cósmica."}
+                        </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        {/* Your Sign */}
+                        <div>
+                            <h2 className="text-2xl font-bold mb-6 text-center">{t.yourSign}</h2>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {signs.map(sign => (
+                                    <div 
+                                        key={sign.id}
+                                        onClick={() => setSelectedSign(sign.id)}
+                                        className={`sign-card p-5 cursor-pointer transition-all ${
+                                            selectedSign === sign.id 
+                                                ? 'ring-2 ring-purple-500 bg-gray-800/60' 
+                                                : 'bg-gray-800/40 hover:bg-gray-800/60'
+                                        }`}
+                                    >
+                                        <div className="text-3xl mb-3 text-center">
+                                            <i className={sign.symbolFA}></i>
+                                        </div>
+                                        <div className="font-semibold text-center">{sign.name}</div>
+                                        <div className="text-xs text-gray-400 text-center mt-1">{sign.dateRange}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        {/* Partner's Sign */}
+                        <div>
+                            <h2 className="text-2xl font-bold mb-6 text-center">{t.partnerSign}</h2>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {signs.map(sign => (
+                                    <div 
+                                        key={sign.id}
+                                        onClick={() => setSelectedPartnerSign(sign.id)}
+                                        className={`sign-card p-5 cursor-pointer transition-all ${
+                                            selectedPartnerSign === sign.id 
+                                                ? 'ring-2 ring-cyan-500 bg-gray-800/60' 
+                                                : 'bg-gray-800/40 hover:bg-gray-800/60'
+                                        }`}
+                                    >
+                                        <div className="text-3xl mb-3 text-center">
+                                            <i className={sign.symbolFA}></i>
+                                        </div>
+                                        <div className="font-semibold text-center">{sign.name}</div>
+                                        <div className="text-xs text-gray-400 text-center mt-1">{sign.dateRange}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="mt-12 text-center">
+                        <button
+                            onClick={calculateCompatibility}
+                            disabled={!selectedSign || !selectedPartnerSign}
+                            className={`px-10 py-5 rounded-2xl font-bold text-xl transition-all ${
+                                !selectedSign || !selectedPartnerSign 
+                                    ? 'bg-gray-700 cursor-not-allowed' 
+                                    : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 shadow-xl'
+                            }`}
+                        >
+                            <i className="fas fa-sync-alt mr-3"></i>
+                            {t.calculate}
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Trait Compatibility Component
+        function TraitCompatibility({ 
+            traits, 
+            userTraits, 
+            setUserTraits, 
+            partnerTraits, 
+            setPartnerTraits, 
+            traitResult, 
+            setTraitResult, 
+            setCurrentView 
+        }) {
+            const { t } = React.useContext(LanguageContext);
+            
+            const toggleTrait = (type, trait, isUser = true) => {
+                const setter = isUser ? setUserTraits : setPartnerTraits;
+                const currentTraits = isUser ? userTraits : partnerTraits;
+                
+                const newTraits = {...currentTraits};
+                const list = type === 'quality' ? 'qualities' : 'flaws';
+                
+                if (newTraits[list].includes(trait)) {
+                    newTraits[list] = newTraits[list].filter(t => t !== trait);
+                } else {
+                    newTraits[list] = [...newTraits[list], trait];
+                }
+                
+                setter(newTraits);
+            };
+            
+            const calculateTraitCompatibility = () => {
+                if (userTraits.qualities.length === 0 && userTraits.flaws.length === 0) return;
+                if (partnerTraits.qualities.length === 0 && partnerTraits.flaws.length === 0) return;
+                
+                // Simple compatibility algorithm
+                let emotionalScore = 75;
+                let logicalScore = 75;
+                let relationalScore = 75;
+                
+                // Analyze quality matches
+                userTraits.qualities.forEach(q1 => {
+                    partnerTraits.qualities.forEach(q2 => {
+                        if (q1 === q2) {
+                            emotionalScore += 10;
+                            logicalScore += 5;
+                            relationalScore += 8;
+                        }
+                    });
+                });
+                
+                // Analyze complementary traits
+                const complementaryPairs = [
+                    ['Impulsivité', 'Patience'],
+                    ['Têtu', 'Adaptabilité'],
+                    ['Indécis', 'Détermination'],
+                    ['Sensible', 'Force'],
+                    ['Colérique', 'Calme']
+                ];
+                
+                userTraits.flaws.forEach(f1 => {
+                    partnerTraits.flaws.forEach(f2 => {
+                        if (f1 === f2) {
+                            emotionalScore -= 5;
+                            relationalScore -= 8;
+                        }
+                    });
+                    
+                    partnerTraits.qualities.forEach(q => {
+                        if (complementaryPairs.some(pair => 
+                            (pair[0] === f1 && pair[1] === q) || 
+                            (pair[1] === f1 && pair[0] === q))) {
+                            emotionalScore += 8;
+                            relationalScore += 10;
+                        }
+                    });
+                });
+                
+                // Cap scores between 0 and 100
+                emotionalScore = Math.max(0, Math.min(100, emotionalScore));
+                logicalScore = Math.max(0, Math.min(100, logicalScore));
+                relationalScore = Math.max(0, Math.min(100, relationalScore));
+                
+                const overallScore = Math.round((emotionalScore + logicalScore + relationalScore) / 3);
+                
+                // Generate analysis
+                let analysis = "";
+                if (overallScore >= 80) {
+                    analysis = t.lang === 'fr' ? 
+                        "Une compatibilité exceptionnelle sur le plan des traits de caractère ! Vos qualités se complètent parfaitement et vos défauts s'équilibrent harmonieusement. Cette relation a un fort potentiel d'épanouissement mutuel." :
+                        t.lang === 'en' ?
+                        "Exceptional compatibility in terms of personality traits! Your qualities complement each other perfectly and your flaws balance harmoniously. This relationship has strong potential for mutual fulfillment." :
+                        "¡Compatibilidad excepcional en términos de rasgos de personalidad! Sus cualidades se complementan perfectamente y sus defectos se equilibran armoniosamente. Esta relación tiene un gran potencial de realización mutua.";
+                } else if (overallScore >= 60) {
+                    analysis = t.lang === 'fr' ? 
+                        "Une bonne compatibilité émotionnelle et relationnelle. Vous partagez des valeurs importantes et vos différences peuvent être source de croissance si vous cultivez la communication et l'empathie." :
+                        t.lang === 'en' ?
+                        "Good emotional and relational compatibility. You share important values and your differences can be a source of growth if you cultivate communication and empathy." :
+                        "Buena compatibilidad emocional y relacional. Comparten valores importantes y sus diferencias pueden ser una fuente de crecimiento si cultivan la comunicación y la empatía.";
+                } else if (overallScore >= 40) {
+                    analysis = t.lang === 'fr' ? 
+                        "Une compatibilité modérée qui nécessitera des efforts conscients. Vos différences de tempérament peuvent créer des tensions, mais aussi des opportunités d'apprentissage si vous abordez les défis avec ouverture d'esprit." :
+                        t.lang === 'en' ?
+                        "Moderate compatibility that will require conscious effort. Your temperamental differences may create tensions, but also learning opportunities if you approach challenges with an open mind." :
+                        "Compatibilidad moderada que requerirá esfuerzo consciente. Sus diferencias de temperamento pueden crear tensiones, pero también oportunidades de aprendizaje si abordan los desafíos con mente abierta.";
+                } else {
+                    analysis = t.lang === 'fr' ? 
+                        "Une compatibilité faible sur le plan des traits de caractère. Cela ne signifie pas que la relation est vouée à l'échec, mais qu'elle demandera une grande maturité émotionnelle et une volonté de comprendre et d'accepter vos différences fondamentales." :
+                        t.lang === 'en' ?
+                        "Low compatibility in terms of personality traits. This does not mean the relationship is doomed to fail, but it will require great emotional maturity and a willingness to understand and accept your fundamental differences." :
+                        "Baja compatibilidad en términos de rasgos de personalidad. Esto no significa que la relación esté condenada al fracaso, pero requerirá una gran madurez emocional y voluntad para comprender y aceptar sus diferencias fundamentales.";
+                }
+                
+                setTraitResult({
+                    emotionalScore,
+                    logicalScore,
+                    relationalScore,
+                    overallScore,
+                    analysis,
+                    userTraits,
+                    partnerTraits
+                });
+                
+                setCurrentView('trait-result');
+            };
+            
+            return (
+                <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-12">
+                        <h1 className="text-4xl font-bold mb-4 astro-title">
+                            {t.traitCompatibility}
+                        </h1>
+                        <p className="text-gray-400 max-w-2xl mx-auto">
+                            {t.lang === 'fr' ? 
+                                "Sélectionnez vos qualités et défauts, ainsi que ceux de votre partenaire, pour une analyse de compatibilité personnalisée." :
+                                t.lang === 'en' ?
+                                "Select your qualities and flaws, as well as those of your partner, for a personalized compatibility analysis." :
+                                "Seleccione sus cualidades y defectos, así como los de su pareja, para un análisis de compatibilidad personalizado."}
+                        </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        {/* Your Traits */}
+                        <div className="sign-card bg-gray-800/40 p-6">
+                            <h2 className="text-2xl font-bold mb-6 text-center text-purple-400">{t.yourTraits}</h2>
+                            
+                            <div className="mb-8">
+                                <h3 className="font-bold text-lg mb-4 flex items-center">
+                                    <i className="fas fa-heart text-purple-400 mr-2"></i>
+                                    {t.qualities}
+                                </h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {traits.qualities.map(trait => (
+                                        <span 
+                                            key={trait}
+                                            onClick={() => toggleTrait('quality', trait, true)}
+                                            className={`trait-pill px-4 py-2 cursor-pointer ${
+                                                userTraits.qualities.includes(trait) 
+                                                    ? 'bg-purple-600 text-white active' 
+                                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                            }`}
+                                        >
+                                            {trait}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 className="font-bold text-lg mb-4 flex items-center">
+                                    <i className="fas fa-exclamation-triangle text-amber-400 mr-2"></i>
+                                    {t.flaws}
+                                </h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {traits.flaws.map(trait => (
+                                        <span 
+                                            key={trait}
+                                            onClick={() => toggleTrait('flaw', trait, true)}
+                                            className={`trait-pill px-4 py-2 cursor-pointer ${
+                                                userTraits.flaws.includes(trait) 
+                                                    ? 'bg-amber-600 text-white active' 
+                                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                            }`}
+                                        >
+                                            {trait}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Partner's Traits */}
+                        <div className="sign-card bg-gray-800/40 p-6">
+                            <h2 className="text-2xl font-bold mb-6 text-center text-cyan-400">{t.partnerTraits}</h2>
+                            
+                            <div className="mb-8">
+                                <h3 className="font-bold text-lg mb-4 flex items-center">
+                                    <i className="fas fa-heart text-cyan-400 mr-2"></i>
+                                    {t.qualities}
+                                </h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {traits.qualities.map(trait => (
+                                        <span 
+                                            key={trait}
+                                            onClick={() => toggleTrait('quality', trait, false)}
+                                            className={`trait-pill px-4 py-2 cursor-pointer ${
+                                                partnerTraits.qualities.includes(trait) 
+                                                    ? 'bg-cyan-600 text-white active' 
+                                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                            }`}
+                                        >
+                                            {trait}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 className="font-bold text-lg mb-4 flex items-center">
+                                    <i className="fas fa-exclamation-triangle text-amber-400 mr-2"></i>
+                                    {t.flaws}
+                                </h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {traits.flaws.map(trait => (
+                                        <span 
+                                            key={trait}
+                                            onClick={() => toggleTrait('flaw', trait, false)}
+                                            className={`trait-pill px-4 py-2 cursor-pointer ${
+                                                partnerTraits.flaws.includes(trait) 
+                                                    ? 'bg-amber-600 text-white active' 
+                                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                            }`}
+                                        >
+                                            {trait}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="mt-12 text-center">
+                        <button
+                            onClick={calculateTraitCompatibility}
+                            disabled={(
+                                (userTraits.qualities.length === 0 && userTraits.flaws.length === 0) ||
+                                (partnerTraits.qualities.length === 0 && partnerTraits.flaws.length === 0)
+                            )}
+                            className={`px-10 py-5 rounded-2xl font-bold text-xl transition-all ${
+                                ((userTraits.qualities.length === 0 && userTraits.flaws.length === 0) ||
+                                (partnerTraits.qualities.length === 0 && partnerTraits.flaws.length === 0))
+                                    ? 'bg-gray-700 cursor-not-allowed' 
+                                    : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 transform hover:scale-105 shadow-xl'
+                            }`}
+                        >
+                            <i className="fas fa-sync-alt mr-3"></i>
+                            {t.analyze}
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Discover Sign Component
+        function DiscoverSign({ signs }) {
+            const { t } = React.useContext(LanguageContext);
+            
+            return (
+                <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-12">
+                        <h1 className="text-4xl font-bold mb-4 astro-title">
+                            {t.discoverSign}
+                        </h1>
+                        <p className="text-gray-400 max-w-2xl mx-auto">
+                            {t.lang === 'fr' ? 
+                                "Découvrez votre signe astrologique en fonction de votre date de naissance et explorez en détail ses caractéristiques uniques." :
+                                t.lang === 'en' ?
+                                "Discover your astrological sign based on your birth date and explore its unique characteristics in detail." :
+                                "Descubra su signo astrológico según su fecha de nacimiento y explore sus características únicas en detalle."}
+                        </p>
+                    </div>
+                    
+                    <div className="sign-card bg-gradient-to-br from-gray-800/60 to-gray-900/60 p-8 mb-12">
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl font-bold mb-4">
+                                {t.lang === 'fr' ? "Quel est votre signe ?" : 
+                                 t.lang === 'en' ? "What is your sign?" : "¿Cuál es tu signo?"}
+                            </h2>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                                {signs.map((sign, index) => (
+                                    <div 
+                                        key={sign.id}
+                                        className="bg-gray-800/50 p-4 rounded-xl border border-gray-700 hover:border-purple-500 transition-colors cursor-pointer"
+                                        onClick={() => {
+                                            setSelectedSign(sign.id);
+                                            setCurrentView('sign-detail');
+                                        }}
+                                    >
+                                        <div className="text-2xl mb-2 text-center">
+                                            <i className={sign.symbolFA}></i>
+                                        </div>
+                                        <div className="font-medium text-center">{sign.name}</div>
+                                        <div className="text-xs text-gray-400 text-center">{sign.dateRange}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="sign-card bg-gradient-to-br from-purple-900/30 to-pink-900/30 p-6">
+                            <div className="text-3xl text-purple-400 mb-4 text-center">
+                                <i className="fas fa-star"></i>
+                            </div>
+                            <h3 className="text-xl font-bold mb-3 text-center">
+                                {t.lang === 'fr' ? "Analyse Profonde" : 
+                                 t.lang === 'en' ? "Deep Analysis" : "Análisis Profundo"}
+                            </h3>
+                            <p className="text-gray-300 text-center">
+                                {t.lang === 'fr' ? 
+                                    "Comprenez vos forces, faiblesses et votre potentiel à travers une analyse détaillée de votre signe." :
+                                    t.lang === 'en' ?
+                                    "Understand your strengths, weaknesses, and potential through a detailed analysis of your sign." :
+                                    "Comprenda sus fortalezas, debilidades y potencial a través de un análisis detallado de su signo."}
+                            </p>
+                        </div>
+                        
+                        <div className="sign-card bg-gradient-to-br from-blue-900/30 to-cyan-900/30 p-6">
+                            <div className="text-3xl text-blue-400 mb-4 text-center">
+                                <i className="fas fa-atom"></i>
+                            </div>
+                            <h3 className="text-xl font-bold mb-3 text-center">
+                                {t.lang === 'fr' ? "Éléments & Planètes" : 
+                                 t.lang === 'en' ? "Elements & Planets" : "Elementos & Planetas"}
+                            </h3>
+                            <p className="text-gray-300 text-center">
+                                {t.lang === 'fr' ? 
+                                    "Découvrez comment les éléments (feu, terre, air, eau) et les planètes influencent votre personnalité." :
+                                    t.lang === 'en' ?
+                                    "Discover how elements (fire, earth, air, water) and planets influence your personality." :
+                                    "Descubra cómo los elementos (fuego, tierra, aire, agua) y los planetas influyen en su personalidad."}
+                            </p>
+                        </div>
+                        
+                        <div className="sign-card bg-gradient-to-br from-amber-900/30 to-orange-900/30 p-6">
+                            <div className="text-3xl text-amber-400 mb-4 text-center">
+                                <i className="fas fa-handshake-angle"></i>
+                            </div>
+                            <h3 className="text-xl font-bold mb-3 text-center">
+                                {t.lang === 'fr' ? "Compatibilités" : 
+                                 t.lang === 'en' ? "Compatibilities" : "Compatibilidades"}
+                            </h3>
+                            <p className="text-gray-300 text-center">
+                                {t.lang === 'fr' ? 
+                                    "Apprenez quels signes sont les plus compatibles avec le vôtre et pourquoi." :
+                                    t.lang === 'en' ?
+                                    "Learn which signs are most compatible with yours and why." :
+                                    "Aprenda qué signos son más compatibles con el suyo y por qué."}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Matching Component
+        function Matching({ signs }) {
+            const { t } = React.useContext(LanguageContext);
+            
+            return (
+                <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-12">
+                        <h1 className="text-4xl font-bold mb-4 astro-title">
+                            {t.matching}
+                        </h1>
+                        <p className="text-gray-400 max-w-2xl mx-auto">
+                            {t.lang === 'fr' ? 
+                                "Découvrez vos meilleures compatibilités astrologiques et apprenez à naviguer dans vos relations." :
+                                t.lang === 'en' ?
+                                "Discover your best astrological compatibilities and learn how to navigate your relationships." :
+                                "Descubra sus mejores compatibilidades astrológicas y aprenda a navegar en sus relaciones."}
+                        </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                        {signs.map(sign => (
+                            <div 
+                                key={sign.id}
+                                className="sign-card bg-gradient-to-br from-gray-800/60 to-gray-900/60 p-6"
+                                style={{
+                                    borderLeft: `4px solid ${sign.color}`
+                                }}
+                            >
+                                <div className="flex items-center mb-4">
+                                    <div className="text-3xl mr-3">
+                                        <i className={sign.symbolFA}></i>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold">{sign.name}</h3>
+                                        <p className="text-sm text-gray-400">{sign.dateRange}</p>
+                                    </div>
+                                </div>
+                                
+                                <h4 className="font-bold text-purple-400 mb-2 flex items-center">
+                                    <i className="fas fa-heart mr-2"></i>
+                                    {t.bestMatches}
+                                </h4>
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {sign.bestMatches.map(match => (
+                                        <span 
+                                            key={match} 
+                                            className="px-3 py-1 bg-purple-900/50 text-purple-300 rounded-full text-sm"
+                                        >
+                                            {match}
+                                        </span>
+                                    ))}
+                                </div>
+                                
+                                <h4 className="font-bold text-amber-400 mb-2 flex items-center">
+                                    <i className="fas fa-shield-halved mr-2"></i>
+                                    {t.worstMatches}
+                                </h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {sign.worstMatches.map(match => (
+                                        <span 
+                                            key={match} 
+                                            className="px-3 py-1 bg-amber-900/50 text-amber-300 rounded-full text-sm"
+                                        >
+                                            {match}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div className="sign-card bg-gradient-to-r from-purple-900/30 to-pink-900/30 p-8">
+                        <div className="text-center">
+                            <h2 className="text-2xl font-bold mb-4">
+                                {t.lang === 'fr' ? "Guide de Compatibilité" : 
+                                 t.lang === 'en' ? "Compatibility Guide" : "Guía de Compatibilidad"}
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                                {[
+                                    { 
+                                        icon: "fas fa-fire", 
+                                        title: t.lang === 'fr' ? "Feu (Bélier, Lion, Sagittaire)" : 
+                                               t.lang === 'en' ? "Fire (Aries, Leo, Sagittarius)" : 
+                                               "Fuego (Aries, Leo, Sagitario)",
+                                        desc: t.lang === 'fr' ? "Passion, énergie, créativité" : 
+                                              t.lang === 'en' ? "Passion, energy, creativity" : 
+                                              "Pasión, energía, creatividad"
+                                    },
+                                    { 
+                                        icon: "fas fa-mountain", 
+                                        title: t.lang === 'fr' ? "Terre (Taureau, Vierge, Capricorne)" : 
+                                               t.lang === 'en' ? "Earth (Taurus, Virgo, Capricorn)" : 
+                                               "Tierra (Tauro, Virgo, Capricornio)",
+                                        desc: t.lang === 'fr' ? "Stabilité, pratique, fiabilité" : 
+                                              t.lang === 'en' ? "Stability, practicality, reliability" : 
+                                              "Estabilidad, practicidad, confiabilidad"
+                                    },
+                                    { 
+                                        icon: "fas fa-wind", 
+                                        title: t.lang === 'fr' ? "Air (Gémeaux, Balance, Verseau)" : 
+                                               t.lang === 'en' ? "Air (Gemini, Libra, Aquarius)" : 
+                                               "Aire (Géminis, Libra, Acuario)",
+                                        desc: t.lang === 'fr' ? "Communication, intellect, sociabilité" : 
+                                              t.lang === 'en' ? "Communication, intellect, sociability" : 
+                                              "Comunicación, intelecto, sociabilidad"
+                                    },
+                                    { 
+                                        icon: "fas fa-water", 
+                                        title: t.lang === 'fr' ? "Eau (Cancer, Scorpion, Poissons)" : 
+                                               t.lang === 'en' ? "Water (Cancer, Scorpio, Pisces)" : 
+                                               "Agua (Cáncer, Escorpio, Piscis)",
+                                        desc: t.lang === 'fr' ? "Émotion, intuition, sensibilité" : 
+                                              t.lang === 'en' ? "Emotion, intuition, sensitivity" : 
+                                              "Emoción, intuición, sensibilidad"
+                                    }
+                                ].map((element, index) => (
+                                    <div key={index} className="bg-gray-800/50 p-4 rounded-xl">
+                                        <div className="text-2xl text-purple-400 mb-2">
+                                            <i className={element.icon}></i>
+                                        </div>
+                                        <h3 className="font-bold mb-1">{element.title}</h3>
+                                        <p className="text-gray-300">{element.desc}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Sign Detail Component
+        function SignDetail({ sign, signs, setCurrentView }) {
+            const { t } = React.useContext(LanguageContext);
+            
+            const getSignByName = (name) => {
+                return signs.find(s => s.name === name || s.english === name || s.spanish === name);
+            };
+            
+            // Get translations for current language
+            const signName = t.lang === 'en' ? sign.english : t.lang === 'es' ? sign.spanish : sign.name;
+            
+            return (
+                <div className="max-w-5xl mx-auto">
+                    <div className="text-center mb-8">
+                        <button 
+                            onClick={() => setCurrentView('discover-sign')}
+                            className="flex items-center text-purple-400 hover:text-purple-300 mb-6"
+                        >
+                            <i className="fas fa-arrow-left mr-2"></i>
+                            {t.lang === 'fr' ? "Retour à la découverte" : 
+                             t.lang === 'en' ? "Back to discovery" : "Volver al descubrimiento"}
+                        </button>
+                        <h1 className="text-5xl font-bold mb-4 astro-title">
+                            {signName}
+                        </h1>
+                        <div className="text-6xl mb-4">
+                            <i className={sign.symbolFA}></i>
+                        </div>
+                        <p className="text-gray-400">{sign.dateRange}</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-2">
+                            <div className="sign-card bg-gradient-to-br from-gray-800/60 to-gray-900/60 p-8 mb-8">
+                                <h2 className="text-2xl font-bold mb-6 flex items-center">
+                                    <i className="fas fa-book-open mr-3 text-purple-400"></i>
+                                    {t.description}
+                                </h2>
+                                <p className="text-lg leading-relaxed">
+                                    {sign.description}
+                                </p>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="sign-card bg-gradient-to-br from-purple-900/30 to-pink-900/30 p-6">
+                                    <h3 className="text-xl font-bold mb-4 flex items-center">
+                                        <i className="fas fa-star mr-2 text-purple-400"></i>
+                                        {t.qualities}
+                                    </h3>
+                                    <ul className="space-y-2">
+                                        {sign.qualities.map((quality, index) => (
+                                            <li key={index} className="flex items-center">
+                                                <div className="matching-dot bg-green-500 mr-2"></div>
+                                                {quality}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                
+                                <div className="sign-card bg-gradient-to-br from-amber-900/30 to-orange-900/30 p-6">
+                                    <h3 className="text-xl font-bold mb-4 flex items-center">
+                                        <i className="fas fa-exclamation-triangle mr-2 text-amber-400"></i>
+                                        {t.flaws}
+                                    </h3>
+                                    <ul className="space-y-2">
+                                        {sign.flaws.map((flaw, index) => (
+                                            <li key={index} className="flex items-center">
+                                                <div className="matching-dot bg-amber-500 mr-2"></div>
+                                                {flaw}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div className="sign-card bg-gradient-to-br from-blue-900/30 to-cyan-900/30 p-6 mb-6">
+                                <h3 className="text-xl font-bold mb-4 flex items-center">
+                                    <i className="fas fa-planet-ringed mr-2 text-blue-400"></i>
+                                    {t.rulingPlanet}
+                                </h3>
+                                <p className="text-lg">{sign.rulingPlanet}</p>
+                            </div>
+                            
+                            <div className="sign-card bg-gradient-to-br from-emerald-900/30 to-teal-900/30 p-6 mb-6">
+                                <h3 className="text-xl font-bold mb-4 flex items-center">
+                                    <i className="fas fa-fire mr-2 text-emerald-400"></i>
+                                    {t.elements}
+                                </h3>
+                                <div className="text-lg">
+                                    <span className="px-3 py-1 bg-emerald-900/50 rounded-full">
+                                        {sign.element}
+                                    </span>
+                                </div>
+                                <p className="mt-3 text-gray-300 text-sm">
+                                    {t.lang === 'fr' ? 
+                                        "Compatible avec:" : 
+                                        t.lang === 'en' ? 
+                                        "Compatible with:" : 
+                                        "Compatible con:"} {" "}
+                                    {sign.compatibleElements.join(", ")}
+                                </p>
+                            </div>
+                            
+                            <div className="sign-card bg-gradient-to-br from-rose-900/30 to-pink-900/30 p-6">
+                                <h3 className="text-xl font-bold mb-4 flex items-center">
+                                    <i className="fas fa-retweet mr-2 text-rose-400"></i>
+                                    {t.opposite}
+                                </h3>
+                                <div className="text-lg">
+                                    {sign.oppositeSign}
+                                </div>
+                                <p className="mt-3 text-gray-300 text-sm">
+                                    {t.lang === 'fr' ? 
+                                        "Polarité complémentaire qui crée une dynamique d'apprentissage." : 
+                                        t.lang === 'en' ? 
+                                        "Complementary polarity that creates a learning dynamic." : 
+                                        "Polaridad complementaria que crea una dinámica de aprendizaje."}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="mt-8">
+                        <h2 className="text-3xl font-bold mb-6 astro-title text-center">
+                            {t.bestMatches}
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {sign.bestMatches.map(matchName => {
+                                const matchSign = getSignByName(matchName);
+                                if (!matchSign) return null;
+                                return (
+                                    <div 
+                                        key={matchName} 
+                                        className="sign-card bg-gradient-to-br from-gray-800/60 to-gray-900/60 p-6 text-center"
+                                        style={{
+                                            borderLeft: `4px solid ${matchSign.color}`
+                                        }}
+                                    >
+                                        <div className="text-4xl mb-3">
+                                            <i className={matchSign.symbolFA}></i>
+                                        </div>
+                                        <h3 className="text-xl font-bold mb-2">
+                                            {t.lang === 'en' ? matchSign.english : 
+                                             t.lang === 'es' ? matchSign.spanish : 
+                                             matchSign.name}
+                                        </h3>
+                                        <div className="text-2xl font-bold text-purple-400 mb-2">
+                                            {sign.compatibility[matchSign.id] || 80}%
+                                        </div>
+                                        <p className="text-gray-400 text-sm">
+                                            {t.lang === 'fr' ? "Excellente compatibilité" : 
+                                             t.lang === 'en' ? "Excellent compatibility" : 
+                                             "Excelente compatibilidad"}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Result View Component
+        function ResultView({ result, type, setCurrentView }) {
+            const { t } = React.useContext(LanguageContext);
+            
+            const shareResult = () => {
+                const text = t.lang === 'fr' ? 
+                    `Ma compatibilité astrologique avec ${type === 'astro' ? `${result.sign2.name}` : 'mon partenaire'} est de ${type === 'astro' ? result.compatibility : result.overallScore}%. Découvrez la vôtre sur Zodiaq !` :
+                    t.lang === 'en' ?
+                    `My astrological compatibility with ${type === 'astro' ? `${result.sign2.english}` : 'my partner'} is ${type === 'astro' ? result.compatibility : result.overallScore}%. Discover yours on Zodiaq!` :
+                    `Mi compatibilidad astrológica con ${type === 'astro' ? `${result.sign2.spanish}` : 'mi pareja'} es de ${type === 'astro' ? result.compatibility : result.overallScore}%. ¡Descubre la tuya en Zodiaq!`;
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Zodiaq - Compatibilité Astrologique',
+                        text: text,
+                        url: window.location.href
+                    }).catch(() => {
+                        // Fallback to copying to clipboard
+                        navigator.clipboard.writeText(text);
+                        alert(t.lang === 'fr' ? 'Lien copié dans le presse-papiers !' : 
+                              t.lang === 'en' ? 'Link copied to clipboard!' : 
+                              '¡Enlace copiado al portapapeles!');
+                    });
+                } else {
+                    navigator.clipboard.writeText(text);
+                    alert(t.lang === 'fr' ? 'Lien copié dans le presse-papiers !' : 
+                          t.lang === 'en' ? 'Link copied to clipboard!' : 
+                          '¡Enlace copiado al portapapeles!');
+                }
+            };
+            
+            return (
+                <div className="max-w-5xl mx-auto">
+                    <div className="text-center mb-8">
+                        <button 
+                            onClick={() => setCurrentView(type === 'astro' ? 'astro-compatibility' : 'trait-compatibility')}
+                            className="flex items-center text-purple-400 hover:text-purple-300 mb-6"
+                        >
+                            <i className="fas fa-arrow-left mr-2"></i>
+                            {t.lang === 'fr' ? "Retour" : 
+                             t.lang === 'en' ? "Back" : "Volver"}
+                        </button>
+                        <h1 className="text-4xl font-bold mb-4 astro-title">
+                            {t.compatibility}
+                        </h1>
+                    </div>
+                    
+                    <div className="result-card">
+                        {type === 'astro' ? (
+                            <AstroResult result={result} />
+                        ) : (
+                            <TraitResult result={result} />
+                        )}
+                    </div>
+                    
+                    <div className="mt-10 flex justify-center space-x-4">
+                        <button
+                            onClick={shareResult}
+                            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium flex items-center hover:opacity-90 transition-opacity"
+                        >
+                            <i className="fas fa-share-alt mr-2"></i>
+                            {t.share}
+                        </button>
+                        <button
+                            onClick={() => setCurrentView('home')}
+                            className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium flex items-center transition-colors"
+                        >
+                            <i className="fas fa-home mr-2"></i>
+                            {t.home}
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Astro Result Component
+        function AstroResult({ result }) {
+            const { t } = React.useContext(LanguageContext);
+            const { sign1, sign2, compatibility, analysis } = result;
+            
+            return (
+                <div className="sign-card bg-gradient-to-br from-gray-800/60 to-gray-900/60 p-8">
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-10">
+                        <div className="text-center">
+                            <div className="text-6xl mb-4">
+                                <i className={sign1.symbolFA}></i>
+                            </div>
+                            <h2 className="text-3xl font-bold">{sign1.name}</h2>
+                            <p className="text-gray-400">{sign1.dateRange}</p>
+                        </div>
+                        
+                        <div className="text-5xl text-purple-400">
+                            <i className="fas fa-exchange-alt"></i>
+                        </div>
+                        
+                        <div className="text-center">
+                            <div className="text-6xl mb-4">
+                                <i className={sign2.symbolFA}></i>
+                            </div>
+                            <h2 className="text-3xl font-bold">{sign2.name}</h2>
+                            <p className="text-gray-400">{sign2.dateRange}</p>
+                        </div>
+                    </div>
+                    
+                    <div className="text-center mb-10">
+                        <div className="text-7xl font-bold mb-4 astro-title">
+                            {compatibility}%
+                        </div>
+                        <div className="text-xl text-gray-400 mb-6">
+                            {t.compatibility}
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-5 overflow-hidden">
+                            <div 
+                                className="compatibility-bar rounded-full h-5" 
+                                style={{ width: `${Math.max(5, compatibility)}%` }}
+                            ></div>
+                        </div>
+                    </div>
+                    
+                    <div className="prose prose-invert max-w-none">
+                        <h3 className="text-2xl font-bold mb-4 flex items-center">
+                            <i className="fas fa-magnifying-glass-chart mr-3 text-purple-400"></i>
+                            {t.analysis}
+                        </h3>
+                        <p className="text-lg mb-8 leading-relaxed">{analysis}</p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="bg-gray-800/50 p-6 rounded-xl">
+                                <h4 className="font-bold text-xl mb-4 flex items-center">
+                                    <i className="fas fa-fire mr-2 text-orange-400"></i>
+                                    {t.elements}
+                                </h4>
+                                <div className="text-lg mb-3">
+                                    <span className="px-4 py-2 bg-orange-900/50 rounded-xl mr-2">
+                                        {sign1.element}
+                                    </span>
+                                    <span className="px-4 py-2 bg-blue-900/50 rounded-xl">
+                                        {sign2.element}
+                                    </span>
+                                </div>
+                                <p className="text-gray-300">
+                                    {getElementsCompatibility(sign1.element, sign2.element)}
+                                </p>
+                            </div>
+                            
+                            <div className="bg-gray-800/50 p-6 rounded-xl">
+                                <h4 className="font-bold text-xl mb-4 flex items-center">
+                                    <i className="fas fa-planet-ringed mr-2 text-purple-400"></i>
+                                    {t.rulingPlanet}
+                                </h4>
+                                <div className="text-lg mb-3">
+                                    <span className="px-4 py-2 bg-purple-900/50 rounded-xl mr-2">
+                                        {sign1.rulingPlanet}
+                                    </span>
+                                    <span className="px-4 py-2 bg-cyan-900/50 rounded-xl">
+                                        {sign2.rulingPlanet}
+                                    </span>
+                                </div>
+                                <p className="text-gray-300">
+                                    {getPlanetsCompatibility(sign1.rulingPlanet, sign2.rulingPlanet)}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div className="mt-8 bg-gray-800/50 p-6 rounded-xl">
+                            <h4 className="font-bold text-xl mb-4 flex items-center">
+                                <i className="fas fa-lightbulb mr-2 text-yellow-400"></i>
+                                {t.lang === 'fr' ? "Conseils pour la relation" : 
+                                 t.lang === 'en' ? "Relationship Advice" : "Consejos para la relación"}
+                            </h4>
+                            <ul className="list-disc pl-6 space-y-3 text-gray-300">
+                                <li>
+                                    {t.lang === 'fr' ? 
+                                        "Communiquez ouvertement sur vos besoins émotionnels et vos attentes." : 
+                                        t.lang === 'en' ? 
+                                        "Communicate openly about your emotional needs and expectations." : 
+                                        "Comunique abiertamente sobre sus necesidades emocionales y expectativas."}
+                                </li>
+                                <li>
+                                    {t.lang === 'fr' ? 
+                                        "Valorisez vos différences comme des complémentarités plutôt que des obstacles." : 
+                                        t.lang === 'en' ? 
+                                        "Value your differences as complementary rather than obstacles." : 
+                                        "Valore sus diferencias como complementarias en lugar de obstáculos."}
+                                </li>
+                                <li>
+                                    {t.lang === 'fr' ? 
+                                        "Planifiez des activités qui nourrissent votre connexion et respectent vos énergies." : 
+                                        t.lang === 'en' ? 
+                                        "Plan activities that nurture your connection and respect your energies." : 
+                                        "Planee actividades que nutran su conexión y respeten sus energías."}
+                                </li>
+                                <li>
+                                    {t.lang === 'fr' ? 
+                                        "Apprenez à reconnaître les signaux d'alerte de votre signe et ceux de votre partenaire." : 
+                                        t.lang === 'en' ? 
+                                        "Learn to recognize warning signs from your sign and your partner's." : 
+                                        "Aprenda a reconocer las señales de alerta de su signo y las de su pareja."}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Trait Result Component
+        function TraitResult({ result }) {
+            const { t } = React.useContext(LanguageContext);
+            const { emotionalScore, logicalScore, relationalScore, overallScore, analysis } = result;
+            
+            return (
+                <div className="sign-card bg-gradient-to-br from-gray-800/60 to-gray-900/60 p-8">
+                    <div className="text-center mb-10">
+                        <div className="text-6xl font-bold mb-4 astro-title">
+                            {overallScore}%
+                        </div>
+                        <div className="text-2xl text-gray-400 mb-8">
+                            {t.overall} {t.compatibility}
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="bg-purple-900/20 p-5 rounded-xl border border-purple-700/50">
+                                <div className="text-purple-400 font-bold text-lg mb-2 flex items-center justify-center">
+                                    <i className="fas fa-heart mr-2"></i>
+                                    {t.emotional}
+                                </div>
+                                <div className="text-3xl font-bold mb-3">{emotionalScore}%</div>
+                                <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                                    <div 
+                                        className="h-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" 
+                                        style={{ width: `${Math.max(5, emotionalScore)}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-blue-900/20 p-5 rounded-xl border border-blue-700/50">
+                                <div className="text-blue-400 font-bold text-lg mb-2 flex items-center justify-center">
+                                    <i className="fas fa-brain mr-2"></i>
+                                    {t.logical}
+                                </div>
+                                <div className="text-3xl font-bold mb-3">{logicalScore}%</div>
+                                <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                                    <div 
+                                        className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500" 
+                                        style={{ width: `${Math.max(5, logicalScore)}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-amber-900/20 p-5 rounded-xl border border-amber-700/50">
+                                <div className="text-amber-400 font-bold text-lg mb-2 flex items-center justify-center">
+                                    <i className="fas fa-handshake mr-2"></i>
+                                    {t.relational}
+                                </div>
+                                <div className="text-3xl font-bold mb-3">{relationalScore}%</div>
+                                <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                                    <div 
+                                        className="h-3 rounded-full bg-gradient-to-r from-amber-500 to-orange-500" 
+                                        style={{ width: `${Math.max(5, relationalScore)}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="prose prose-invert max-w-none">
+                        <h3 className="text-2xl font-bold mb-4 flex items-center">
+                            <i className="fas fa-magnifying-glass-chart mr-3 text-purple-400"></i>
+                            {t.analysis}
+                        </h3>
+                        <p className="text-lg mb-8 leading-relaxed">{analysis}</p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="bg-gray-800/50 p-6 rounded-xl">
+                                <h4 className="font-bold text-xl mb-4 flex items-center">
+                                    <i className="fas fa-heart-circle-check mr-2 text-green-400"></i>
+                                    {t.lang === 'fr' ? "Points forts" : 
+                                     t.lang === 'en' ? "Strengths" : "Puntos fuertes"}
+                                </h4>
+                                <ul className="list-disc pl-6 space-y-2 text-gray-300">
+                                    {result.userTraits.qualities.filter(q => 
+                                        result.partnerTraits.qualities.includes(q)
+                                    ).map(q => (
+                                        <li key={q}>
+                                            <span className="font-medium text-green-300">{q}</span> {" "}
+                                            {t.lang === 'fr' ? "partagé" : 
+                                             t.lang === 'en' ? "shared" : "compartido"}
+                                        </li>
+                                    ))}
+                                    {result.userTraits.qualities.filter(q => 
+                                        result.partnerTraits.flaws.some(f => isComplementary(q, f))
+                                    ).map(q => (
+                                        <li key={q}>
+                                            <span className="font-medium text-green-300">{q}</span> {" "}
+                                            {t.lang === 'fr' ? "complète" : 
+                                             t.lang === 'en' ? "complements" : "complementa"} {" "}
+                                            <span className="text-amber-300 italic">
+                                                {result.partnerTraits.flaws.find(f => isComplementary(q, f))}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            
+                            <div className="bg-gray-800/50 p-6 rounded-xl">
+                                <h4 className="font-bold text-xl mb-4 flex items-center">
+                                    <i className="fas fa-triangle-exclamation mr-2 text-amber-400"></i>
+                                    {t.lang === 'fr' ? "Points d'attention" : 
+                                     t.lang === 'en' ? "Areas of attention" : "Puntos de atención"}
+                                </h4>
+                                <ul className="list-disc pl-6 space-y-2 text-gray-300">
+                                    {result.userTraits.flaws.filter(f => 
+                                        result.partnerTraits.flaws.includes(f)
+                                    ).map(f => (
+                                        <li key={f}>
+                                            <span className="font-medium text-amber-300">{f}</span> {" "}
+                                            {t.lang === 'fr' ? "partagé" : 
+                                             t.lang === 'en' ? "shared" : "compartido"}
+                                        </li>
+                                    ))}
+                                    {result.userTraits.flaws.filter(f => 
+                                        !result.partnerTraits.qualities.some(q => isComplementary(f, q))
+                                    ).slice(0, 3).map(f => (
+                                        <li key={f}>
+                                            <span className="font-medium text-amber-300">{f}</span> {" "}
+                                            {t.lang === 'fr' ? "sans contrepartie positive" : 
+                                             t.lang === 'en' ? "without positive counterpart" : 
+                                             "sin contrapartida positiva"}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div className="mt-8 bg-gray-800/50 p-6 rounded-xl">
+                            <h4 className="font-bold text-xl mb-4 flex items-center">
+                                <i className="fas fa-star mr-2 text-purple-400"></i>
+                                {t.lang === 'fr' ? "Recommandations personnalisées" : 
+                                 t.lang === 'en' ? "Personalized recommendations" : 
+                                 "Recomendaciones personalizadas"}
+                            </h4>
+                            <ul className="list-disc pl-6 space-y-3 text-gray-300">
+                                <li>
+                                    {t.lang === 'fr' ? 
+                                        "Pratiquez l'écoute active et la validation émotionnelle pour renforcer votre connexion." : 
+                                        t.lang === 'en' ? 
+                                        "Practice active listening and emotional validation to strengthen your connection." : 
+                                        "Practique la escucha activa y la validación emocional para fortalecer su conexión."}
+                                </li>
+                                <li>
+                                    {t.lang === 'fr' ? 
+                                        "Créez des rituels relationnels qui respectent les besoins de chacun." : 
+                                        t.lang === 'en' ? 
+                                        "Create relationship rituals that respect each other's needs." : 
+                                        "Cree rituales relacionales que respeten las necesidades de cada uno."}
+                                </li>
+                                <li>
+                                    {t.lang === 'fr' ? 
+                                        "Développez la compassion pour les défauts de l'autre, en les voyant comme des vulnérabilités." : 
+                                        t.lang === 'en' ? 
+                                        "Develop compassion for your partner's flaws, seeing them as vulnerabilities." : 
+                                        "Desarrolle compasión por los defectos del otro, viéndolos como vulnerabilidades."}
+                                </li>
+                                <li>
+                                    {t.lang === 'fr' ? 
+                                        "Célébrez vos différences comme des opportunités d'apprentissage mutuel." : 
+                                        t.lang === 'en' ? 
+                                        "Celebrate your differences as opportunities for mutual learning." : 
+                                        "Celebre sus diferencias como oportunidades de aprendizaje mutuo."}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Helper functions
+        function getElementsCompatibility(element1, element2) {
+            const compatibilities = {
+                'Feu': { 
+                    'Feu': 'Harmonie intense - passion partagée et énergie dynamique', 
+                    'Terre': 'Complémentarité - l\'énergie du Feu active la stabilité de la Terre', 
+                    'Air': 'Synergie parfaite - l\'Air alimente le Feu, créant inspiration et créativité', 
+                    'Eau': 'Défi créatif - l\'Eau tempère le Feu, nécessitant un équilibre délicat' 
+                },
+                'Terre': { 
+                    'Feu': 'Complémentarité - l\'énergie du Feu active la stabilité de la Terre', 
+                    'Terre': 'Sécurité mutuelle - stabilité, fiabilité et pragmatisme partagés', 
+                    'Air': 'Défi stimulant - la Terre ancre les idées de l\'Air dans la réalité', 
+                    'Eau': 'Harmonie naturelle - la Terre contient l\'Eau, créant un environnement émotionnel sécurisant' 
+                },
+                'Air': { 
+                    'Feu': 'Synergie parfaite - l\'Air alimente le Feu, créant inspiration et créativité', 
+                    'Terre': 'Défi stimulant - la Terre ancre les idées de l\'Air dans la réalité', 
+                    'Air': 'Connexion intellectuelle - échange d\'idées fluide et stimulation mutuelle', 
+                    'Eau': 'Complémentarité émotionnelle - l\'Air aide à exprimer les émotions de l\'Eau' 
+                },
+                'Eau': { 
+                    'Feu': 'Défi créatif - l\'Eau tempère le Feu, nécessitant un équilibre délicat', 
+                    'Terre': 'Harmonie naturelle - la Terre contient l\'Eau, créant un environnement émotionnel sécurisant', 
+                    'Air': 'Complémentarité émotionnelle - l\'Air aide à exprimer les émotions de l\'Eau', 
+                    'Eau': 'Profondeur émotionnelle - intuition partagée et connexion empathique intense' 
+                }
+            };
+            return compatibilities[element1][element2];
+        }
+        
+        function getPlanetsCompatibility(planet1, planet2) {
+            if (planet1.includes(planet2) || planet2.includes(planet1)) {
+                return "Synergie planétaire forte - influences harmonieuses et renforcement mutuel";
+            }
+            if ((planet1.includes("Mars") && planet2.includes("Vénus")) || 
+                (planet1.includes("Vénus") && planet2.includes("Mars"))) {
+                return "Polarité complémentaire - attraction passionnée et équilibre dynamique";
+            }
+            if ((planet1.includes("Mercure") && (planet2.includes("Mercure") || planet2.includes("Vénus"))) ||
+                (planet2.includes("Mercure") && (planet1.includes("Mercure") || planet1.includes("Vénus")))) {
+                return "Connexion intellectuelle et communicative - échange fluide et compréhension mutuelle";
+            }
+            if ((planet1.includes("Lune") && planet2.includes("Soleil")) ||
+                (planet1.includes("Soleil") && planet2.includes("Lune"))) {
+                return "Équilibre fondamental - complémentarité entre l'essence (Soleil) et les émotions (Lune)";
+            }
+            return "Influences planétaires différentes qui créent une dynamique d'apprentissage intéressante";
+        }
+        
+        function isComplementary(trait1, trait2) {
+            const complementaryPairs = [
+                ['Patience', 'Impulsivité'],
+                ['Adaptabilité', 'Têtu'],
+                ['Détermination', 'Indécis'],
+                ['Force', 'Sensible'],
+                ['Calme', 'Colérique'],
+                ['Optimisme', 'Pessimiste'],
+                ['Ouverture', 'Possessif'],
+                ['Empathie', 'Distant']
+            ];
+            
+            return complementaryPairs.some(pair => 
+                (pair[0] === trait1 && pair[1] === trait2) || 
+                (pair[1] === trait1 && pair[0] === trait2)
+            );
+        }
+        
+        // Footer Component
+        function Footer() {
+            const { t } = React.useContext(LanguageContext);
+            
+            return (
+                <footer className="container mx-auto px-4 py-12 mt-16 border-t border-gray-800">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                        <div>
+                            <div className="flex items-center space-x-3 mb-6">
+                                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
+                                    <i className="fas fa-star text-white"></i>
+                                </div>
+                                <h3 className="text-2xl font-bold astro-title">Zodiaq</h3>
+                            </div>
+                            <p className="text-gray-400 mb-6">
+                                {t.lang === 'fr' ? 
+                                    "Explorez les mystères des étoiles et découvrez votre compatibilité cosmique." : 
+                                    t.lang === 'en' ? 
+                                    "Explore the mysteries of the stars and discover your cosmic compatibility." : 
+                                    "Explore los misterios de las estrellas y descubra su compatibilidad cósmica."}
+                            </p>
+                            <div className="flex space-x-4">
+                                <a href="#" className="text-gray-400 hover:text-purple-400">
+                                    <i className="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" className="text-gray-400 hover:text-purple-400">
+                                    <i className="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" className="text-gray-400 hover:text-purple-400">
+                                    <i className="fab fa-instagram"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 className="text-lg font-bold mb-6 text-purple-400">
+                                {t.lang === 'fr' ? "Navigation" : 
+                                 t.lang === 'en' ? "Navigation" : "Navegación"}
+                            </h4>
+                            <ul className="space-y-3 text-gray-400">
+                                <li><a href="#" className="hover:text-white">{t.home}</a></li>
+                                <li><a href="#" className="hover:text-white">{t.astroCompatibility}</a></li>
+                                <li><a href="#" className="hover:text-white">{t.discoverSign}</a></li>
+                                <li><a href="#" className="hover:text-white">{t.matching}</a></li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 className="text-lg font-bold mb-6 text-purple-400">
+                                {t.lang === 'fr' ? "Ressources" : 
+                                 t.lang === 'en' ? "Resources" : "Recursos"}
+                            </h4>
+                            <ul className="space-y-3 text-gray-400">
+                                <li><a href="#" className="hover:text-white">
+                                    {t.lang === 'fr' ? "Guide des signes" : 
+                                     t.lang === 'en' ? "Sign Guide" : "Guía de signos"}
+                                </a></li>
+                                <li><a href="#" className="hover:text-white">
+                                    {t.lang === 'fr' ? "Compatibilités détaillées" : 
+                                     t.lang === 'en' ? "Detailed Compatibilities" : 
+                                     "Compatibilidades detalladas"}
+                                </a></li>
+                                <li><a href="#" className="hover:text-white">
+                                    {t.lang === 'fr' ? "Astrologie avancée" : 
+                                     t.lang === 'en' ? "Advanced Astrology" : 
+                                     "Astrología avanzada"}
+                                </a></li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 className="text-lg font-bold mb-6 text-purple-400">{t.contact}</h4>
+                            <div className="space-y-4 text-gray-400">
+                                <div className="flex items-start">
+                                    <i className="fas fa-envelope mt-1 mr-3 text-purple-400"></i>
+                                    <span>karlluberisse1308@gmail.com</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-500">
+                        <p>&copy; {new Date().getFullYear()} Zodiaq. {t.lang === 'fr' ? "Tous droits réservés." : 
+                                                                           t.lang === 'en' ? "All rights reserved." : 
+                                                                           "Todos los derechos reservados."}</p>
+                    </div>
+                </footer>
+            );
+        }
+        
+        // Render the App
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
